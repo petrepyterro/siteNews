@@ -117,6 +117,29 @@ class DB{
         return FALSE;
     }
     
+    //create a custom function for UPDATE query
+    public function update($table, $id, $fields){
+        $set = '';
+        $x = 1;
+        
+        foreach ($fields as $name => $value){
+            $set .= "{$name} = ?";
+            if ($x<count($fields)){
+                $set .= ', ';
+            }
+            $x++;
+        }
+        
+        //create the SQL string to feed in the prepared statement
+        //that it'll be executed in the custom query function
+        $sql = "UPDATE {$table} SET {$set} WHERE id={$id}";
+        if(!$this->query($sql, $fields)->error()){
+            return TRUE;
+        }
+        
+        return FALSE;
+    }
+    
     public function error(){
         return $this->_error;
     }
