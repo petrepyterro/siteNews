@@ -91,6 +91,32 @@ class DB{
         return $this->action("DELETE", $table, $where);
     }
     
+    //create a custom function for INSERT query
+    public function insert($table, $fields = array()){
+        if(count($fields)){
+            $keys = array_keys($fields);
+            $values = '';
+            $x = 1;
+            
+            foreach($fields as $field){
+                $values .= '? ';
+                if ($x<count($fields)){
+                    $values .= ', ';
+                }
+                $x++;
+            }
+            
+            //create the SQL string to feed in the prepared statement
+            //that it'll be executed in the custom query function of this class
+            $sql = "INSERT INTO users (`" . implode('`, `', $keys) . "`) VALUES ($values)";
+            echo $sql;
+            if (!$this->query($sql, $fields)->error()){
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+    
     public function error(){
         return $this->_error;
     }
@@ -99,5 +125,14 @@ class DB{
     //by queries execution
     public function count(){
         return $this->_count;
+    }
+    
+    //return first result of query execution
+    public function first(){
+        return $this->_results[0];
+    }
+    
+    public function results(){
+        return $this->_results;
     }
 }
