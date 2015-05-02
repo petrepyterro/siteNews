@@ -2,6 +2,13 @@
 <!DOCTYPE html>
 <html lang="en">
     <?php include_once 'includes/header.php';?>
+    <?php 
+        DB::getInstance()->insert('users', array(
+            'username'  => 'alex',
+            'name'      => 'aba',
+            'password'  => 'avalon'
+        ));
+    ?>
     <body>        
         <div class="container">
             <?php if(Session::exists('success')) Helper::successFlash(Session::flash('success'))?>                    

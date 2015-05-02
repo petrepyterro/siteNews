@@ -33,8 +33,22 @@
                         ));
 
                         if($validation->passed()){
-                            Session::flash('success', 'You registered successfully!');
-                            header('Location: index.php');
+                            $user = new User();
+                            try{
+                                $salt = Hash::salt(32);
+                                $user->create(array(
+                                    'username'      => Input::get('username'),
+                                    'user'          => Input::get('name'),
+                                    'password'      => Input::get('password'),
+                                    'salt'          => $salt,
+                                    
+                                ));
+                                
+                                Session::flash('success', 'You have been registered and can now log in!');
+                                //header('Location: index.php');
+                            } catch (Exception $e) {
+                                die($e->getMessage());
+                            }
                         } else {
                             Helper::failingFlashes($validation->errors());
                         }

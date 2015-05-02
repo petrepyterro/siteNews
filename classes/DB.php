@@ -109,7 +109,6 @@ class DB{
             //create the SQL string to feed in the prepared statement
             //that it'll be executed in the custom query function of this class
             $sql = "INSERT INTO users (`" . implode('`, `', $keys) . "`) VALUES ($values)";
-            echo $sql;
             if (!$this->query($sql, $fields)->error()){
                 return TRUE;
             }
