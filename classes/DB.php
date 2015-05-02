@@ -25,4 +25,79 @@ class DB{
         }
         return self::$_instance;    
     }
+    
+    
+    public function query($sql, $params = array()) {
+        $this->_error = FALSE;
+        if($this->_query = $this->_pdo->prepare($sql)){
+            $x = 1;
+            //bind the value of each $params item
+            //to prepared PDO statement
+            if(count($params)){
+                foreach($params as $param){
+                    $this->_query->bindValue($x, $param);
+                    $x++;
+                }
+            }
+            
+            //try to execute the prepared PDO statement
+            //if some errors occur undo the changes
+            //made by execution of the statement
+            $this->_pdo->beginTransaction();
+            try{
+                
+                $this->_query->execute();
+                $this->_results = $this->_query->fetchAll(PDO::FETCH_OBJ);
+                $this->_count = $this->_query->rowCount();
+                $this->_pdo->commit();
+            } catch (PDOException $e){
+                $this->_pdo->rollBack();
+                $this->_error = TRUE;
+            }
+            
+        }
+        return $this;
+    }
+    
+    //create one generic function no matter which query type we'll execute
+    //e.g DELETE, SELECT 
+    public function action($action, $table, $where = array()){
+        if(count($where) === 3){
+            $operators = array('=', '>', '<', '>=', '<=');
+            $field      = $where[0];
+            $operator   = $where[1];
+            $value      = $where[2];
+            
+            //create the SQL string to feed in the prepared statement
+            //that it'll be executed in the custom query function
+            //created above
+            if(in_array($operator, $operators)){
+                $sql = "{$action} FROM {$table} WHERE {$field} {$operator} ?";
+                if (!$this->query($sql, array($value))->error()){
+                    return $this;
+                }
+            }
+        }
+        return FALSE;
+    }
+    
+    //create a custom function for SELECT queries
+    public function get($table, $where){
+        return $this->action("SELECT *", $table, $where);
+    }
+    
+    //create a custom function for DELETE queries
+    public function delete($table, $where){
+        return $this->action("DELETE", $table, $where);
+    }
+    
+    public function error(){
+        return $this->_error;
+    }
+    
+    //count the number of results returned
+    //by queries execution
+    public function count(){
+        return $this->_count;
+    }
 }
