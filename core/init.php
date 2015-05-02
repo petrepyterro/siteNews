@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 //define global variables that we'll use throughout entire application
 $GLOBALS['config'] = array(
@@ -14,10 +15,10 @@ $GLOBALS['config'] = array(
         'cookie_name'   => 'hash',
         'cookie_expiry' => '604800' 
     ),
-    // a good way against Session Fixation attacks is to change the name of the session
-    //from it's default name PHPSESSID
+    
     'session'       => array(
-        'session_name'  => 'user'
+        'session_name'  => 'user',
+        'token_name'    => 'token'
     )
 );
 
